@@ -1,0 +1,21 @@
+{
+  "name": "web-curl-to-har",
+  "version": "1.0.1",
+  "description": "一个浏览器环境下用于将curl命令转换成har对象的工具库",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "node test/test.ejs",
+    "build": "rollup -c rollup.config.js"
+  },
+  "author": "Apipost-Team",
+  "license": "MIT",
+  "dependencies": {
+    "web-tree-sitter": "^0.20.8"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.1",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "rollup": "^2.78.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4"
+  }
+}
