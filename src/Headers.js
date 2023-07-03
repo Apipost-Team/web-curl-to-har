@@ -56,7 +56,7 @@ export class Headers {
                     warnings.push([
                         "header-file",
                         "passing a file for --header/-H is not supported: " +
-                            JSON.stringify(header.toString()),
+                        JSON.stringify(header.toString()),
                     ]);
                     continue;
                 }
@@ -67,9 +67,9 @@ export class Headers {
                         warnings.push([
                             "header-expression",
                             "ignoring " +
-                                nameToken.type +
-                                " in header name\n" +
-                                underlineNode(nameToken.syntaxNode),
+                            nameToken.type +
+                            " in header name\n" +
+                            underlineNode(nameToken.syntaxNode),
                         ]);
                     }
                     // TODO: whitespace-only headers are treated incosistently.
@@ -179,6 +179,15 @@ export class Headers {
         }
         return contentTypeHeader.split(";")[0].trim().toString();
     }
+    getBoundary() {
+        const contentTypeHeader = this.get("content-type");
+        if (!contentTypeHeader) {
+            return contentTypeHeader;
+        }
+        const boundary = contentTypeHeader.match(/boundary=(?=(-{4}\w+))/);
+        return boundary?.[1];
+    }
+
     has(header) {
         const lookup = header.toLowerCase();
         for (const h of this.headers) {

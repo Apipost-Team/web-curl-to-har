@@ -2,6 +2,7 @@ import { btoa } from "./utils.js";
 import { warnIfPartsIgnored } from "./Warnings.js";
 import { parse, COMMON_SUPPORTED_ARGS } from "./parse.js";
 import { parseQueryString } from "./Query.js";
+import multipart from 'parse-multipart-data';
 const supportedArgs = new Set([
   ...COMMON_SUPPORTED_ARGS,
   //   "form",
@@ -15,6 +16,52 @@ const supportedArgs = new Set([
   "http3",
   "http3-only",
 ]);
+
+function getFilesString(request) {
+  if (!request.multipartUploads) {
+    return undefined;
+  }
+  const dataList = [];
+  for (const m of request.multipartUploads) {
+    console.log(JSON.stringify(m));
+    dataList.push({
+      name: m?.name?.toString(),
+      value: m?.content?.toString() || m?.filename?.toString(),
+    });
+  }
+  if (dataList.length === 0) {
+    return undefined;
+  }
+  const mimeType = request?.headers?.getContentType() || "multipart/form-data";
+  return {
+    mimeType,
+    params: dataList,
+  };
+}
+
+function getMultipartData(request, boundary) {
+  let requestBody = request.data.toString();
+  if (!requestBody) {
+    return undefined;
+  }
+  const multyParts = multipart.parse(Buffer.from(requestBody), boundary);
+  const dataList = [];
+  for (let item of multyParts) {
+    dataList.push({
+      name: item.name,
+      value: item.filename,
+    });
+  }
+  if (dataList.length === 0) {
+    return undefined;
+  }
+  const mimeType = request.headers.getContentType() || "";
+  return {
+    mimeType,
+    params: dataList,
+  };
+}
+
 function getDataString(request) {
   if (!request.data) {
     return null;
@@ -81,6 +128,24 @@ function _requestAndUrlToHar(request, url, warnings = []) {
       value: q[1].toString(),
     }));
   }
+
+  if (request?.multipartUploads) {
+    const fileData = getFilesString(request);
+    if (fileData) {
+      requestHar.postData = fileData;
+    }
+  }
+
+  //如果是文件
+  const boundary = request.headers.getBoundary();
+  if (boundary !== undefined) {
+    const multipartData = getMultipartData(request, boundary);
+    if (multipartData) {
+      requestHar.postData = multipartData;
+    }
+    return requestHar;
+  }
+
   if (request.data) {
     const harData = getDataString(request);
     if (harData) {
