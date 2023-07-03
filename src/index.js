@@ -2,7 +2,7 @@ import { btoa } from "./utils.js";
 import { warnIfPartsIgnored } from "./Warnings.js";
 import { parse, COMMON_SUPPORTED_ARGS } from "./parse.js";
 import { parseQueryString } from "./Query.js";
-import multipart from 'parse-multipart-data';
+const multipart = require('parse-multipart-data');
 const supportedArgs = new Set([
   ...COMMON_SUPPORTED_ARGS,
   //   "form",
@@ -23,7 +23,6 @@ function getFilesString(request) {
   }
   const dataList = [];
   for (const m of request.multipartUploads) {
-    console.log(JSON.stringify(m));
     dataList.push({
       name: m?.name?.toString(),
       value: m?.content?.toString() || m?.filename?.toString(),
@@ -80,7 +79,7 @@ function getDataString(request) {
         })),
       };
     }
-  } catch (_a) {}
+  } catch (_a) { }
   const text = request.data.toString();
   return { mimeType, text };
 }
@@ -91,8 +90,8 @@ function _requestAndUrlToHar(request, url, warnings = []) {
     httpVersion: request.http3
       ? "HTTP/3"
       : request.http2
-      ? "HTTP/2"
-      : "HTTP/1.1",
+        ? "HTTP/2"
+        : "HTTP/1.1",
     cookies: [],
     headers: [],
     queryString: [],
