@@ -1,6 +1,6 @@
 {
   "name": "web-curl-to-har",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "一个浏览器环境下用于将curl命令转换成har对象的工具库",
   "main": "dist/index.js",
   "scripts": {
