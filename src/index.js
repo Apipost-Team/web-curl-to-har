@@ -45,17 +45,27 @@ function getFilesString(request) {
 
 function getMultipartData(request, boundary) {
   let requestBody = request.data.toString();
+
   if (!requestBody) {
     return undefined;
   }
+
   const multyParts = multipart.parse(Buffer.from(requestBody), boundary);
+
   const dataList = [];
   for (let item of multyParts) {
-    dataList.push({
-      name: item.name,
-      value: item.filename,
-      fileName: item.filename,
-    });
+    if (item.filename) {
+      dataList.push({
+        name: item.name,
+        value: item.filename,
+        fileName: item.filename,
+      });
+    } else {
+      dataList.push({
+        name: item.name,
+        value: item?.data?.toString() || "",
+      });
+    }
   }
   if (dataList.length === 0) {
     return undefined;
